@@ -8,7 +8,7 @@ Este repositório contém a API backend para o chatbot inteligente do curso Jove
 * Gerar respostas automáticas com base nas informações extraídas do site.
 * Fornecer uma mensagem padrão caso a informação não seja encontrada.
 
-## Módulo do Projeto (1º PI - Back-end) [cite: 4]
+## Módulo do Projeto (1º PI - Back-end)
 
 Este módulo foca na criação da API, estruturação da coleta e interpretação de informações do site, e resposta via IA.
 
