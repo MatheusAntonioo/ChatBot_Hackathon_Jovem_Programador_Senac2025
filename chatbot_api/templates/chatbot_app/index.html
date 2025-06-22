@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROTÓTIPO CHATBOT JP</title>
+    <style>
+        /* Estilos Gerais do Corpo */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1a1a2e; /* Fundo escuro */
+            color: #e0e0e0; /* Cor do texto padrão */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Ocupa a altura total da viewport */
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box; /* Inclui padding na altura */
+        }
+
+        /* Estilo da Janela do Chatbot */
+        .chatbot-container {
+            background-color: #2a2a4a; /* Fundo mais claro que o body, para contraste */
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Sombra suave */
+            width: 100%;
+            max-width: 500px; /* Largura máxima da janela */
+            height: 70vh; /* Altura da janela (ajustável) */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Garante que nada saia da borda arredondada */
+        }
+
+        /* Cabeçalho do Chatbot */
+        .chatbot-header {
+            background-color: #6a0dad; /* Roxo escuro para o cabeçalho */
+            color: white;
+            padding: 15px 20px;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        /* Caixa de Mensagens */
+        #chat-box {
+            flex-grow: 1; /* Ocupa todo o espaço disponível */
+            padding: 15px;
+            overflow-y: auto; /* Rolagem quando o conteúdo exceder */
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* Espaço entre as mensagens */
+            scrollbar-width: thin; /* Para Firefox */
+            scrollbar-color: #6a0dad #3a3a5a; /* Roxo para o scroll, fundo do scroll */
+        }
+
+        /* Estilo da barra de rolagem para Webkit (Chrome, Safari) */
+        #chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #chat-box::-webkit-scrollbar-track {
+            background: #3a3a5a; /* Fundo da barra de rolagem */
+            border-radius: 10px;
+        }
+
+        #chat-box::-webkit-scrollbar-thumb {
+            background-color: #6a0dad; /* Cor do "polegar" da barra de rolagem */
+            border-radius: 10px;
+            border: 2px solid #3a3a5a;
+        }
+
+        /* Estilo das Mensagens */
+        .message {
+            max-width: 80%; /* Limita a largura da bolha de mensagem */
+            padding: 10px 15px;
+            border-radius: 18px;
+            word-wrap: break-word; /* Quebra palavras longas */
+        }
+
+        .user-message {
+            background-color: #4a148c; /* Roxo mais claro para mensagens do usuário */
+            color: white;
+            align-self: flex-end; /* Alinha à direita */
+            border-bottom-right-radius: 5px; /* Deixa uma pontinha para simular bolha */
+        }
+
+        .bot-message {
+            background-color: #3a3a5a; /* Cinza arroxeado para mensagens do bot */
+            color: #e0e0e0;
+            align-self: flex-start; /* Alinha à esquerda */
+            border-bottom-left-radius: 5px; /* Deixa uma pontinha para simular bolha */
+        }
+
+        /* Estilo para o loading */
+        .loading-message {
+            background-color: #4a4a6a; /* Cor diferente para o loading */
+            color: #e0e0e0;
+            align-self: flex-start;
+            padding: 10px 15px;
+            border-radius: 18px;
+            border-bottom-left-radius: 5px;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        /* Área de Input */
+        .chatbot-input-area {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #4a4a6a; /* Linha divisória sutil */
+        }
+
+        #user-input {
+            flex-grow: 1; /* Ocupa a maior parte do espaço */
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            background-color: #3a3a5a; /* Fundo do input */
+            color: #e0e0e0;
+            font-size: 1em;
+            outline: none; /* Remove a borda de foco */
+            margin-right: 10px;
+        }
+
+        #user-input::placeholder {
+            color: #b0b0b0; /* Cor do placeholder */
+        }
+
+        /* Estilo para input desabilitado */
+        #user-input:disabled {
+            background-color: #2a2a4a;
+            cursor: not-allowed;
+        }
+
+        button {
+            background-color: #6a0dad; /* Roxo para o botão */
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease; /* Transição suave */
+        }
+
+        button:hover:not(:disabled) { /* Não aplica hover se o botão estiver desabilitado */
+            background-color: #8a2be2; /* Roxo um pouco mais claro ao passar o mouse */
+        }
+
+        /* Estilo para botão desabilitado */
+        button:disabled {
+            background-color: #4a4a6a; /* Cor mais escura para desabilitado */
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot-container">
+        <div class="chatbot-header">
+            Protótipo Chatbot
+        </div>
+        <div id="chat-box">
+            </div>
+        <div class="chatbot-input-area">
+            <input type="text" id="user-input" placeholder="Digite sua mensagem..." maxlength="150"> <button id="send-button" onclick="sendMessage()">Enviar</button> </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button'); // Obter o botão
+
+        // Variável de controle para o estado de envio
+        let isSending = false;
+        let loadingMessageDiv = null; // Para armazenar o div de loading
+
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.textContent = text;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return messageDiv; // Retorna o div para referência
+        }
+
+        function toggleInputState(disabled) {
+            userInput.disabled = disabled;
+            sendButton.disabled = disabled;
+            isSending = disabled;
+        }
+
+        async function sendMessage() {
+            if (isSending) return; // Impede múltiplos envios enquanto uma requisição está em andamento
+
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            if (message.length > 150) { // Validação de limite de caracteres
+                alert('A sua pergunta não pode ter mais de 150 caracteres.');
+                return;
+            }
+
+            // Exibe a mensagem do usuário
+            addMessage(message, 'user');
+            userInput.value = ''; // Limpa o input
+
+            // Desabilita input e botão e mostra loading
+            toggleInputState(true);
+            loadingMessageDiv = addMessage('Digitando...', 'loading'); // Exibe a mensagem de loading
+
+            try {
+                const response = await fetch('/chat/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // 'X-CSRFToken': getCookie('csrftoken'), // Descomente para produção com CSRF
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                // Remove a mensagem de loading antes de exibir a resposta real
+                if (loadingMessageDiv && chatBox.contains(loadingMessageDiv)) {
+                    chatBox.removeChild(loadingMessageDiv);
+                    loadingMessageDiv = null;
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Erro na requisição');
+                }
+
+                const data = await response.json();
+                addMessage(data.response, 'bot'); // Exibe a resposta do bot
+
+            } catch (error) {
+                console.error('Erro:', error);
+                // Remove a mensagem de loading se o erro ocorrer antes da resposta
+                if (loadingMessageDiv && chatBox.contains(loadingMessageDiv)) {
+                    chatBox.removeChild(loadingMessageDiv);
+                    loadingMessageDiv = null;
+                }
+                addMessage('Desculpe, houve um erro ao processar sua solicitação: ' + error.message, 'bot');
+            } finally {
+                // Reabilita input e botão
+                toggleInputState(false);
+            }
+        }
+
+        // Função para obter o CSRF token (necessária em produção)
+        // function getCookie(name) {
+        //     let cookieValue = null;
+        //     if (document.cookie && document.cookie !== '') {
+        //         const cookies = document.cookie.split(';');
+        //         for (let i = 0; i < cookies.length; i++) {
+        //             const cookie = cookies[i].trim();
+        //             if (cookie.startsWith(name + '=')) {
+        //                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        //                 break;
+        //             }
+        //         }
+        //     }
+        //     return cookieValue;
+        // }
+
+        // Adiciona funcionalidade de enviar com Enter
+        userInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Adiciona uma mensagem inicial do bot ao carregar a página
+        window.onload = function() {
+            addMessage('Olá! Como posso ajudar você hoje?', 'bot');
+        };
+
+    </script>
+</body>
+</html>
