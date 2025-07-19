@@ -40,23 +40,27 @@ async def chatbot_view(request):
             # --- Lógica para determinar o system_prompt com base na pergunta ---
 
             # 1. Prioridade: Perguntas sobre a criação/hackaton (resposta fixa)
-            hackaton_keywords = ['quem te criou', 'quem te fez', 'quem lhe criou', 'projeto hackaton', 'projeto do hackaton senac', 'equipe', 'time', 'desenvolvedor', 'senac', 'criada por', 'protótipo']
+            hackaton_keywords = ['qual linguagem?', 'qual a linguagem você foi desenvolvida?', 'em que linguagem você foi desenvolvida?', 'qual linguagem usada?', ]
             if any(keyword in user_message_text for keyword in hackaton_keywords):
                 bot_response_text = (
-                    "Fui criada pela equipe Python Rangers como projeto para o Hackaton do Senac. "
-                    "A equipe é formada pelos alunos do curso Jovem Programador: "
-                    "Renato Teodoro, Matheus Moraes, Hudson Franco, Gustavo Lohn e Vinícius Costa. "
-                    "Professora responsável: Karina Fernandes. Coordenador do curso: Vladmir Machado. Gestor de Núcleo: Cleber Rodrigues."
+                    "Estou sendo desenvolvida na linguagem Python, utilizando o framework Django entre outras ferramentas!"
+                )
+
+            # 1. Prioridade: Perguntas sobre a criação/hackaton (resposta fixa)
+            hackaton_keywords2 = ['qual sua idade?', 'quantos anos tem?', 'quantos anos você tem?' ]
+            if any(keyword in user_message_text for keyword in hackaton_keywords2):
+                bot_response_text = (
+                    "Ainda não saí do forno! Mas quando sair, lá por novembro de 2025, prometo que serei deliciosa."
+                    "😜"
                 )
 
             # 2. Segunda prioridade: Perguntas sobre a identidade geral da ADA (nome, quem é, propósito)
             # Nestes casos, a ADA DEVE usar conhecimento geral, não o site.
-            elif any(keyword in user_message_text for keyword in ['porque ada', 'seu nome', 'quem é você', 'sua identidade', 'sua origem', 'seu propósito', 'o que você faz', 'por que ada']):
+            
+            elif any(keyword in user_message_text for keyword in ['qual seu nome?', 'porque ADA?', 'porque este nome?']):
                 system_prompt_ada_identity = (
-                    "Você é ADA, uma assistente virtual criada para responder dúvidas com base em informações confiáveis. "
-                    "Quando o usuário perguntar sobre seu nome, identidade, origem ou propósito, você deve usar seu conhecimento geral para oferecer a melhor explicação possível. "
-                    "Seja sempre prestativa, clara e educada nas respostas."
-                    "Resumir para retornar um texto com no maximo 300 caracteres."
+                    "respoonda sempre educadamente e de forma clara. "
+                    "responda que seu nomé é em homenagem a ADA LOVELACE tirando um texto curto sobre ela na internet."
                 )
                 # Não precisamos raspar o site para estas perguntas, então a chamada à raspagem é pulada.
                 bot_response_text = get_openai_response(user_message_text, system_prompt_override=system_prompt_ada_identity)
